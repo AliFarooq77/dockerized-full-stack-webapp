@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ./backend
+    container_name: my-laravel-app
+    ports:
+      - "8000:80"
+    volumes:
+      - ./backend:/var/www/html
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: nutri
+      DB_USERNAME: root
+      DB_PASSWORD: "@w7tm3cK8"  # Fixed: wrapped in quotes, removed backtick
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: react-nginx
+    ports:
+      - "3000:80"
+    depends_on:
+      - app
+    environment:
+      REACT_APP_API_URL: "http://localhost:8000"
+
+  db:
+    image: mysql:8.0
+    container_name: mysql-db
+    restart: always
+    environment:
+      MYSQL_DATABASE: nutri
+      MYSQL_ROOT_PASSWORD: "@w7tm3cK8"  # Fixed
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
+
