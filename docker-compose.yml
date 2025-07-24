@@ -16,7 +16,7 @@ services:
       DB_PORT: 3306
       DB_DATABASE: nutri
       DB_USERNAME: root
-      DB_PASSWORD: "@w7tm3cK8"  # Fixed: wrapped in quotes, removed backtick
+      DB_PASSWORD: "123"  # Fixed: wrapped in quotes, removed backtick
 
   frontend:
     build:
@@ -34,7 +34,7 @@ services:
     restart: always
     environment:
       MYSQL_DATABASE: nutri
-      MYSQL_ROOT_PASSWORD: "@w7tm3cK8"  # Fixed
+      MYSQL_ROOT_PASSWORD: "123"  # Fixed
     ports:
       - "3306:3306"
     volumes:
