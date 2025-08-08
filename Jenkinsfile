@@ -20,9 +20,9 @@ pipeline{
                 //sh "docker compose up -d"
             }
         }
-        stage('Test'){
+        //stage('Test'){
             
-        }
+        //}
         stage('Push to DockerHub'){
             steps{
                 echo "Pushing the image to Docker Hub"
