@@ -3,10 +3,30 @@ import { Plus, Trash2, Coffee, Sun, Moon } from 'lucide-react';
 
 const MealTracker = ({ meals, addFood, removeFood, getDailyTotals }) => {
   const [newFoods, setNewFoods] = useState({
-    1: { name: "", calories: "", protein: "", carbs: "", fat: "" },
-    2: { name: "", calories: "", protein: "", carbs: "", fat: "" },
-    3: { name: "", calories: "", protein: "", carbs: "", fat: "" }
+    'breakfast': { name: "", calories: "", protein: "", carbs: "", fat: "" },
+    'lunch': { name: "", calories: "", protein: "", carbs: "", fat: "" },
+    'dinner': { name: "", calories: "", protein: "", carbs: "", fat: "" }
   });
+
+  // Safety check: ensure meals is an array
+  const safeMeals = Array.isArray(meals) ? meals : [];
+
+  // Debug logging
+  console.log('MealTracker received meals:', meals);
+  console.log('Safe meals:', safeMeals);
+
+  // If meals array is completely empty or null, this should not happen
+  // because App.js should always provide at least emptyMeals structure
+  if (safeMeals.length === 0) {
+    console.warn('MealTracker received empty meals array - this should not happen');
+    return (
+      <div className="mt-4">
+        <div className="alert alert-warning text-center">
+          No meal structure available. Please refresh the page.
+        </div>
+      </div>
+    );
+  }
 
   const handleInputChange = (mealId, field, value) => {
     setNewFoods(prev => ({
@@ -37,13 +57,23 @@ const MealTracker = ({ meals, addFood, removeFood, getDailyTotals }) => {
       'Sun': Sun,
       'Moon': Moon
     };
-    return icons[iconName];
+    return icons[iconName] || Coffee; // Default to Coffee icon if not found
   };
 
   return (
     <div className="mt-4">
-      {meals.map(meal => {
-        const mealTotals = getDailyTotals([meal]);
+      {safeMeals.map(meal => {
+        // Ensure meal has required properties
+        if (!meal || !meal.name || !meal.id) {
+          console.warn('Invalid meal structure:', meal);
+          return null;
+        }
+
+        // Ensure meal.foods is an array
+        const foods = Array.isArray(meal.foods) ? meal.foods : [];
+        const mealWithSafeFoods = { ...meal, foods };
+
+        const mealTotals = getDailyTotals([mealWithSafeFoods]);
         const MealIcon = getIconComponent(meal.icon);
 
         return (
@@ -65,7 +95,7 @@ const MealTracker = ({ meals, addFood, removeFood, getDailyTotals }) => {
                       type="text"
                       placeholder="Food name"
                       className="form-control"
-                      value={newFoods[meal.id].name}
+                      value={newFoods[meal.id]?.name || ""}
                       onChange={(e) => handleInputChange(meal.id, 'name', e.target.value)}
                     />
                   </div>
@@ -74,7 +104,7 @@ const MealTracker = ({ meals, addFood, removeFood, getDailyTotals }) => {
                       type="number"
                       placeholder="Calories"
                       className="form-control"
-                      value={newFoods[meal.id].calories}
+                      value={newFoods[meal.id]?.calories || ""}
                       onChange={(e) => handleInputChange(meal.id, 'calories', e.target.value)}
                     />
                   </div>
@@ -83,7 +113,7 @@ const MealTracker = ({ meals, addFood, removeFood, getDailyTotals }) => {
                       type="number"
                       placeholder="Protein (g)"
                       className="form-control"
-                      value={newFoods[meal.id].protein}
+                      value={newFoods[meal.id]?.protein || ""}
                       onChange={(e) => handleInputChange(meal.id, 'protein', e.target.value)}
                     />
                   </div>
@@ -92,7 +122,7 @@ const MealTracker = ({ meals, addFood, removeFood, getDailyTotals }) => {
                       type="number"
                       placeholder="Carbs (g)"
                       className="form-control"
-                      value={newFoods[meal.id].carbs}
+                      value={newFoods[meal.id]?.carbs || ""}
                       onChange={(e) => handleInputChange(meal.id, 'carbs', e.target.value)}
                     />
                   </div>
@@ -101,7 +131,7 @@ const MealTracker = ({ meals, addFood, removeFood, getDailyTotals }) => {
                       type="number"
                       placeholder="Fat (g)"
                       className="form-control"
-                      value={newFoods[meal.id].fat}
+                      value={newFoods[meal.id]?.fat || ""}
                       onChange={(e) => handleInputChange(meal.id, 'fat', e.target.value)}
                     />
                   </div>
@@ -118,23 +148,37 @@ const MealTracker = ({ meals, addFood, removeFood, getDailyTotals }) => {
               </div>
 
               <div className="vstack gap-2">
-                {meal.foods.map((food, index) => (
-                  <div key={index} className="p-3 bg-light rounded d-flex align-items-center justify-content-between">
-                    <div className="row flex-grow-1 align-items-center">
-                      <div className="col-md-3 fw-medium">{food.name}</div>
-                      <div className="col-md-2">{food.calories} cal</div>
-                      <div className="col-md-2">{food.protein}g protein</div>
-                      <div className="col-md-2">{food.carbs}g carbs</div>
-                      <div className="col-md-2">{food.fat}g fat</div>
-                    </div>
-                    <button
-                      onClick={() => removeFood(meal.id, food.name)}
-                      className="btn btn-link text-danger p-2"
-                    >
-                      <Trash2 size={20} />
-                    </button>
+                {foods.length === 0 ? (
+                  <div className="text-muted text-center p-3">
+                    No foods added for this meal yet.
                   </div>
-                ))}
+                ) : (
+                  foods.map((food, index) => {
+                    // Safety check for each food item
+                    if (!food || typeof food !== 'object') {
+                      return null;
+                    }
+
+                    return (
+                      <div key={food.id || index} className="p-3 bg-light rounded d-flex align-items-center justify-content-between">
+                        <div className="row flex-grow-1 align-items-center">
+                          <div className="col-md-3 fw-medium">{food.name || 'Unknown Food'}</div>
+                          <div className="col-md-2">{food.calories || 0} cal</div>
+                          <div className="col-md-2">{food.protein || 0}g protein</div>
+                          <div className="col-md-2">{food.carbs || 0}g carbs</div>
+                          <div className="col-md-2">{food.fat || 0}g fat</div>
+                        </div>
+                        <button
+                          onClick={() => removeFood(meal.id, food.id)} // Pass food.id instead of food.name
+                          className="btn btn-link text-danger p-2"
+                          disabled={!food.id} // Disable if no ID (shouldn't happen)
+                        >
+                          <Trash2 size={20} />
+                        </button>
+                      </div>
+                    );
+                  })
+                )}
               </div>
             </div>
           </div>

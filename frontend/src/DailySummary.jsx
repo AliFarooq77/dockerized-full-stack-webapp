@@ -1,20 +1,44 @@
 import React from 'react';
-import {initialMeals} from './App.js'
+//import {initialMeals} from './App.js'
 import { UtensilsCrossed } from 'lucide-react';
 
 const DailySummary = ({ nutritionData, selectedDate, getDailyTotals }) => {
-  const selectedDayData = nutritionData[selectedDate.toDateString()] || initialMeals;
+  // Create consistent date key function (same as in App.js)
+  const createDateKey = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const dateKey = createDateKey(selectedDate);
+  const selectedDayData = nutritionData[dateKey];
   const dailyTotals = getDailyTotals(selectedDayData);
+  
+  // Debug logging
+  console.log('DailySummary - selectedDate:', selectedDate);
+  console.log('DailySummary - dateKey:', dateKey);
+  console.log('DailySummary - selectedDayData:', selectedDayData);
+  console.log('DailySummary - dailyTotals:', dailyTotals);
   
   return (
     <div className="card mt-4">
       <div className="card-header">
         <h5 className="card-title mb-0 d-flex align-items-center">
           <UtensilsCrossed className="text-primary me-2" />
-          Daily Summary
+          Daily Summary for {selectedDate.toLocaleDateString()}
         </h5>
       </div>
       <div className="card-body">
+        {/* Debug info - remove this once working */}
+        <div className="alert alert-light mb-3">
+          <small>
+            Date Key: {dateKey} | 
+            Has Data: {selectedDayData ? 'Yes' : 'No'} | 
+            Data Type: {Array.isArray(selectedDayData) ? 'Array' : typeof selectedDayData}
+          </small>
+        </div>
+        
         <div className="row g-3">
           <div className="col-md-6">
             <div className="p-3 bg-primary bg-opacity-10 rounded">
