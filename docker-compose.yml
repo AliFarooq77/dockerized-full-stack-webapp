@@ -17,6 +17,8 @@ services:
       DB_DATABASE: nutri
       DB_USERNAME: root
       DB_PASSWORD: "123"  # Fixed: wrapped in quotes, removed backtick
+    networks:
+      - app-network
 
   frontend:
     build:
@@ -28,6 +30,8 @@ services:
       - app
     environment:
       REACT_APP_API_URL: "http://localhost:8000"
+    networks:
+      - app-network
 
   db:
     image: mysql:8.0
@@ -40,7 +44,13 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
       - ./my_nutri_data.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - app-network
 
 volumes:
   mysql_data:
+
+networks:
+  app-network:
+    driver: bridge
 
