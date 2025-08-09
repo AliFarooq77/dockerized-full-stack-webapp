@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  app:
+  backend:
     build:
       context: ./backend
     image: my-laravel-app
@@ -23,11 +23,13 @@ services:
   frontend:
     build:
       context: ./frontend
+      args:
+        - REACT_APP_API_URL=http://localhost:8000
     image: my-react-app
     ports:
       - "3000:80"
     depends_on:
-      - app
+      - backend
     environment:
       REACT_APP_API_URL: "http://localhost:8000"
     networks:

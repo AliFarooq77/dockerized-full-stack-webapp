@@ -39,6 +39,10 @@ const App = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+  console.log("The value of REACT_APP_API_URL is: " + process.env.REACT_APP_API_URL);
+
+
   // Create consistent date key function
   const createDateKey = (date) => {
     // Use local date components to avoid timezone issues
@@ -82,7 +86,8 @@ const App = () => {
     console.log(`Fetching data for: ${formattedDate}`);
     
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/meals/${formattedDate}`);
+      const response = await fetch(`${API_BASE_URL}/api/meals/${formattedDate}`);
+
       
       if (!response.ok) {
         if (response.status === 404) {
@@ -255,7 +260,7 @@ const App = () => {
       
       console.log('Request body:', requestBody);
       
-      const response = await fetch('http://localhost:8000/api/meals', {
+      const response = await fetch(`${API_BASE_URL}/api/meals`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -319,7 +324,7 @@ const App = () => {
     
     // DELETE request to backend using the food ID
     try {
-      const response = await fetch(`http://localhost:8000/api/foods/${foodId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/foods/${foodId}`, {
         method: 'DELETE'
       });
 
