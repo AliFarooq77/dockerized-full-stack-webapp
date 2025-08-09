@@ -86,7 +86,12 @@ const App = () => {
     console.log(`Fetching data for: ${formattedDate}`);
     
     try {
-      const response = await fetch(`${API_BASE_URL}/api/meals/${formattedDate}`);
+      const response = await fetch(`${API_BASE_URL}/api/meals/${formattedDate}`, {
+      	mode: 'cors',
+      	 headers: {
+    		'Content-Type': 'application/json'
+  	 }
+      });
 
       
       if (!response.ok) {
@@ -261,9 +266,11 @@ const App = () => {
       console.log('Request body:', requestBody);
       
       const response = await fetch(`${API_BASE_URL}/api/meals`, {
+        mode: 'cors',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
         body: JSON.stringify(requestBody)
       });
@@ -325,6 +332,7 @@ const App = () => {
     // DELETE request to backend using the food ID
     try {
       const response = await fetch(`${API_BASE_URL}/api/foods/${foodId}`, {
+      	mode: 'cors',
         method: 'DELETE'
       });
 
